@@ -168,7 +168,13 @@ bool WiFiComponent::wifi_sta_connect_(WiFiAP ap) {
   if (ap.get_channel().has_value()) {
     conf.sta.channel = *ap.get_channel();
   }
+  
+  // allow (but not require) Protected Management Frame to be WPA3 compatible
+  // cf. https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/wifi.html?highlight=wpa3#wi-fi-security
+  conf.sta.pmf_cfg.capable = true;
+  conf.sta.pmf_cfg.required = false;
 
+  // if already connected and config is different disconnect first
   wifi_config_t current_conf;
   esp_err_t err;
   esp_wifi_get_config(WIFI_IF_STA, &current_conf);
